@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from .models import ShortLink
 from .serializers import ShortLinkSerializer
 from rest_framework.response import Response
+from django.shortcuts import redirect
 
 @api_view(['GET','POST'])
 def short_urls(request):
@@ -15,3 +16,11 @@ def short_urls(request):
             serializer.save()
             return Response(serializer.data, status=201)
     return Response({"message":"Something went wrong..."})
+
+
+def short_url_redirect(request, id):
+    try:
+        link = ShortLink.objects.get(id=id)
+        return redirect(link.originalURL)
+    except ShortLink.DoesNotExist:
+        return Response({"message":"Short link not found."}, status=404)
